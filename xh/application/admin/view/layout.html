@@ -1,0 +1,82 @@
+{include file="Common/header" /}
+<div id="pjax-container">
+<div id="wrapper">
+
+    {include file="Common/sidebar" /}
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div class="row border-bottom">
+            <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <div class="navbar-header">
+                    <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+                    <!--<form role="search" class="navbar-form-custom" action="search_results.html">-->
+                        <!--<div class="form-group">-->
+                            <!--<input type="text" placeholder="Search for something..." class="form-control" name="top-search" id="top-search">-->
+                        <!--</div>-->
+                    <!--</form>-->
+                </div>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li>
+                        <a data-toggle="modal" data-target="#myModal5">
+                            <i class="fa fa-unlock-alt"></i> 修改密码
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{:url('admin/auth/unlogin')}" class="">
+                            <i class="fa fa-sign-out"></i> 退出登录
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+
+        {__CONTENT__}
+    </div>
+</div>
+    <div class="modal inmodal fade" id="myModal5" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">关闭</span></button>
+                    <h4 class="modal-title">设置新密码</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                    <form class="form-horizontal" id="add-user">
+                        <div class="form-group"><label class="col-lg-2 control-label">新密码</label>
+
+                            <div class="col-lg-10"><input type="password" placeholder="新密码" class="form-control" name="password" id="password">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-offset-2 col-lg-10">
+                                <button class="btn btn-success btn-block" type="button" onclick="set_pwd()">设置</button>
+                            </div>
+                        </div>
+                    </form>
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function set_pwd() {
+            var password = $('#password').val();
+            $.post("{:url('admin/system/updatePassword')}", { password: password }, function (data) {
+                if (data.status == 1){
+                    layer.msg('修改成功', {icon:1, time:600}, function () {
+                        window.location.reload();
+                    })
+                }else {
+                    layer.msg(data.msg, {icon: 2, time:800})
+                }
+            })
+        }
+    </script>
+
+{include file="Common/footer" /}
+</div>

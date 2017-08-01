@@ -1,0 +1,21 @@
+
+<nav class="navbar-default navbar-static-side " role="navigation" style="background: #2f4050; position: fixed;z-index: 2001;height: 100%;overflow-x: hidden; overflow-y: auto;">
+    <div class="sidebar-collapse" >
+        <ul class="nav metismenu" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <span style="float: left;"><img alt="image" class="img-circle" src="__admin__/img/5.png" style="width: 48px;"/></span>
+                    <a href="#" style="float: left; padding-left: 20px;">
+                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{$Think.session.admin_info.username}</strong>
+                             </span> <span class="text-muted text-xs block">超级管理员 </span> </span> </a>
+                </div>
+                <div class="logo-element navbar-minimalize minimalize-styl-2">
+                    KT
+                </div>
+                <div style="clear: both;"></div>
+            </li>
+            {$admin_menu}
+        </ul>
+
+    </div>
+</nav>

@@ -1,0 +1,66 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>添加{$label}</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="{:url('admin/index/index')}">控制台</a>
+            </li>
+            <li>
+                <a href="{:url('/admin/'.$route)}">{$label}列表</a>
+            </li>
+            <li class="active">
+                <strong>添加{$label}</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated ">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <!--<h5>All form elements <small>With custom checbox and radion elements.</small></h5>-->
+            </div>
+            <div class="ibox-content">
+                <form method="post" class="form-horizontal" action="{:url('/admin/'.$route)}">
+                    {foreach $formFields as $v}
+                    <div class="form-group"><label class="col-sm-2 control-label">{$translations[$v]['text']}</label>
+                        <div class="col-sm-9">
+                            <?php if(empty($translations[$v]['type'])){ ?>
+                                <input type="text" name="{$v}" class="form-control">
+                            <?php }else{ ?>
+                            {switch name="$translations[$v]['type']" }
+                                {case value="status"}
+                                    <select name="{$v}" class="form-control">
+                                        {foreach $translations[$v]['label'] as $_k => $_x}
+                                            <option value="{$_k}">{$_x['text']}</option>
+                                        {/foreach}
+                                    </select>
+                                {/case}
+                                {case value="textarea"}
+                                    <textarea name="{$v}" class="form-control"></textarea>
+                                {/case}
+                                {default /}配置错误
+                            {/switch}
+                            <?php } ?>
+                            {notempty name="$translations[$v]['info']"}
+                                <span class="help-block m-b-none">{$translations[$v]['info'] }                     {/notempty}
+                        </div>
+                    </div>
+                    {/foreach}
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <a class="btn btn-white" href="{:url('/admin/'.$route)}">取消并返回</a>
+                            <button class="btn btn-primary" type="submit">确认添加</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

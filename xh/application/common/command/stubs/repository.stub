@@ -1,0 +1,11 @@
+<?php
+
+namespace {%namespace%};
+
+class {%className%} extends Repository
+{
+    public function model()
+    {
+        //return
+    }
+}

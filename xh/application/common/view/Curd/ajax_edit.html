@@ -1,0 +1,341 @@
+<!-- 配置文件 -->
+<script type="text/javascript" src="__admin__/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="__admin__/ueditor/ueditor.all.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="__admin__/uploadify/Huploadify.css"/>
+<script src="__admin__/uploadify/jquery.Huploadify.js"></script>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>编辑{$label}</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="{:url('admin/index/index')}">控制台</a>
+            </li>
+            <li>
+                <a href="{:url('/admin/'.$route)}">{$label}列表</a>
+            </li>
+            <li class="active">
+                <strong>编辑{$label}</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated ">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <!--<h5>All form elements <small>With custom checbox and radion elements.</small></h5>-->
+            </div>
+            <div class="ibox-content">
+                <form method="post" class="form-horizontal" id="form">
+                	<input type="hidden" name="__token__" value="{$Request.token}" />
+                    {foreach $formFields as $v}
+                    <div class="form-group"><label class="col-sm-2 control-label">{$translations[$v]['text']}</label>
+                        <div class="col-sm-9">
+                            <?php if(empty($translations[$v]['type'])){ ?>
+                                <input type="text" name="{$v}" value="{$data[$v]}" class="form-control">
+                            <?php }else{ ?>
+                            {switch name="$translations[$v]['type']" }
+                                {case value="status"}
+                                    <select name="{$v}" class="form-control">
+                                        {foreach $translations[$v]['label'] as $_k => $_x}
+                                            <option value="{$_k}" {eq name="$data[$v]" value="$_k"} selected {/eq}>{$_x['text']}</option>
+                                        {/foreach}
+                                    </select>
+                                {/case}
+                                {case value="textarea"}
+                                    <textarea name="{$v}" class="form-control">{$data[$v]}</textarea>
+                                {/case}
+                                {case value="guanlian"}
+                                <select name="{$v}" class="form-control">
+                                    <?php $data_list = get_guanlian_list($translations[$v]['table'], $translations[$v]['where']); ?>
+                                    <option value="0">---请选择</option>
+                                    {foreach $data_list as $__x}
+                                    <option value="{$__x['id']}" {eq name="$__x['id']" value="$data[$v]"}selected{/eq}>{$__x[$translations[$v]['show_field']]}</option>
+                                    {/foreach}
+                                </select>
+                                {/case}
+                            {case value="select"}
+
+                            <select name="{$v}" class="form-control">
+                                <option value="0">请选择---</option>
+                                <?php if(!empty($translations[$v]['data'])){ ?>
+                                {foreach $translations[$v]['data'] as $_y}
+                                {$_y}
+                                {/foreach}
+                                <?php }?>
+                            </select>
+                            {/case}
+                            {case value="ueditor"}
+                            <script id="{$v}" name="{$v}" type="text/plain">{$data[$v]}</script>
+                            <!-- 实例化编辑器 -->
+                            <script type="text/javascript">
+                                var ue = UE.getEditor('{$v}');
+                            </script>
+                            {/case}
+                            {case value="image"}
+                            <span id="img-pre-{$v}">
+                                <img src="{$data[$v]}" width="70px" height="70px">
+                            </span>
+                            <input type="hidden" name="{$v}" value="{$data[$v]}" id="{$v}" />
+                            <div id="up-{$v}"></div>
+                            <script>
+                                $('#up-{$v}').Huploadify({
+                                    auto:true,
+                                    fileTypeExts:'*.jpg;*.png;*.gif',
+                                    multi:false,
+                                    fileSizeLimit:9999,
+                                    showUploadedPercent:true,//是否实时显示上传的百分比，如20%
+                                    showUploadedSize:true,
+                                    removeTimeout:1000,
+                                    buttonText:'选择图片',
+                                    uploader:"{:url('admin/index/upImg')}",
+                                    onUploadStart:function(){
+                                        //alert('开始上传');
+                                    },
+                                    onInit:function(){
+                                        //alert('初始化');
+                                    },
+                                    onUploadComplete:function(data, msg){
+                                        var msg = $.parseJSON(msg);
+                                        if (msg.status == 1){
+                                            var html = "<img src='"+msg.path+"' width='70px;' height='70px;'/>";
+                                            $("#{$v}").val(msg.path);
+                                            $("#img-pre-{$v}").html(html);
+                                        }else {
+                                            layer.msg(msg.msg)
+                                        }
+                                    },
+                                    onDelete:function(file){
+                                        console.log('删除的文件：'+file);
+                                        console.log(file);
+                                    }
+                                });
+                            </script>
+                            {/case}
+                            {case value="images"}
+                            <span id="pic-pre-{$v}">
+                                <?php $_file = empty($data[$v])? []: explode(',', trim($data[$v], ',')); foreach($_file as $__k => $__v){  ?>
+                                <img src='{$__v}' class="{$v} {$v}-{$__k+1}" style='width: 75px; height: 75px;'>
+                                &nbsp; <a title="删除" class="{$v}-{$__k+1}" onclick="del_images($('.{$v}-{$__k+1}'), $('#{$v}'), $('#pic-pre-{$v}'), '{$v}')"><font color="red"><i class="fa fa-times"></i></font> </a>
+                                <?php } ?>
+                            </span>
+                            <input type="hidden" name="{$v}" id="{$v}" value="{$data[$v]}" />
+                            <div id="up-{$v}"></div>
+                            <script>
+                                $('#up-{$v}').Huploadify({
+                                    auto:true,
+                                    fileTypeExts:'*.jpg;*.png;*.gif;*.zip;*.rar;*.mp4;*.mp3;*.avi',
+                                    multi:true,
+                                    fileSizeLimit:20480,
+                                    showUploadedPercent:true,//是否实时显示上传的百分比，如20%
+                                    showUploadedSize:true,
+                                    removeTimeout:1000,
+                                    buttonText:'选择文件',
+                                    uploader:"{:url('admin/index/upImg')}",
+                                    onUploadStart:function(){
+                                        //alert('开始上传');
+                                    },
+                                    onInit:function(){
+                                        //alert('初始化');
+                                    },
+                                    onUploadComplete:function(data, msg){
+                                        var msg = $.parseJSON(msg);
+                                        if (msg.status == 1){
+                                            var old_html = $("#pic-pre-{$v}").html();
+                                            var old_path = $("#{$v}").val();
+                                            var num = $('#pic-pre-{$v}').find('.{$v}').length + 1;
+                                            var html = old_html + "" +
+                                                "<img src='"+msg.path+"' class=\"{$v} {$v}-"+num+"\" style='width: 75px; height: 75px;'>" +
+                                                "  &nbsp; <a title=\"删除\" class=\"{$v}-"+num+"\" onclick=\"del_images($('.{$v}-"+num+"'), $('#{$v}'), $('#pic-pre-{$v}'), '{$v}')\"><font color=\"red\"><i class=\"fa fa-times\"></i></font> </a>";
+                                            $("#{$v}").val(old_path+msg.path+',');
+                                            $("#pic-pre-{$v}").html(html);
+                                        }else {
+                                            layer.msg(msg.msg)
+                                        }
+                                    },
+                                    onDelete:function(file){
+                                        console.log('删除的文件：'+file);
+                                        console.log(file);
+                                    }
+                                });
+                            </script>
+                            {/case}
+                            {case value="file"}
+                            <span id="file-pre-{$v}">
+                                {notempty name="$data[$v]"}
+                                    <a href="{$data[$v]}" class="{$v}" target="_blank">{$data[$v]}</a> &nbsp; <a title="删除" class="{$v}" onclick="del_file($('.{$v}'), $('#{$v}'))"><font color="red"><i class="fa fa-times"></i></font> </a><br/>
+                                {/notempty}
+                                    </span>
+                            <input type="hidden" name="{$v}" id="{ $v }" value="{$data[$v]}"/>
+                            <div id="up-{ $v }"></div>
+                            <script>
+                                $('#up-{$v}').Huploadify({
+                                    auto:true,
+                                    fileTypeExts:'*.jpg;*.png;*.gif;*.zip;*.rar;*.mp4;*.mp3;*.avi',
+                                    multi:false,
+                                    fileSizeLimit:20480,
+                                    showUploadedPercent:true,//是否实时显示上传的百分比，如20%
+                                    showUploadedSize:true,
+                                    removeTimeout:1000,
+                                    buttonText:'选择文件',
+                                    uploader:"{:url('admin/index/upFile')}",
+                                    onUploadStart:function(){
+                                        //alert('开始上传');
+                                    },
+                                    onInit:function(){
+                                        //alert('初始化');
+                                    },
+                                    onUploadComplete:function(data, msg){
+                                        var msg = $.parseJSON(msg);
+                                        if (msg.status == 1){
+                                            var html = "<a class=\"{$v}\" href='"+msg.path+"' target='_blank'>"+msg.path+"</a> &nbsp; <a title=\"删除\" class=\"{$v}\" onclick=\"del_file($('.{$v}'), $('#{$v}'))\"><font color=\"red\"><i class=\"fa fa-times\"></i></font> </a><br/>";
+                                            $("#{$v}").val(msg.path);
+
+                                            $("#file-pre-{$v}").html(html);
+                                        }else {
+                                            layer.msg(msg.msg)
+                                        }
+                                    },
+                                    onDelete:function(file){
+                                        console.log('删除的文件：'+file);
+                                        console.log(file);
+                                    }
+                                });
+                            </script>
+                            {/case}
+                            {case value="files"}
+                            <span id="file-pre-{$v}">
+                                <?php $_file = empty($data[$v])? []: explode(',', trim($data[$v], ',')); foreach($_file as $__k => $__v){  ?>
+                                <a href='{$__v}' target='_blank' class="{$v} {$v}-{$__k+1}">{$__v}</a>&nbsp; <a title="删除" class="file-{$__k+1}" onclick="del_files($('.file-{$__k+1}'), $('#{$v}'), $('#file-pre-{$v}'), '{$v}')"><font color="red"><i class="fa fa-times"></i></font> </a> <br/>
+                <?php } ?>
+                            </span>
+                            <input type="hidden" name="{$v}" id="{$v}" value="{$data[$v]}" />
+                            <div id="up-{$v}"></div>
+                            <script>
+                                $('#up-{$v}').Huploadify({
+                                    auto:true,
+                                    fileTypeExts:'*.jpg;*.png;*.gif;*.zip;*.rar;*.mp4;*.mp3;*.avi',
+                                    multi:false,
+                                    fileSizeLimit:20480,
+                                    showUploadedPercent:true,//是否实时显示上传的百分比，如20%
+                                    showUploadedSize:true,
+                                    removeTimeout:1000,
+                                    buttonText:'选择文件',
+                                    uploader:"{:url('admin/index/upFile')}",
+                                    onUploadStart:function(){
+                                        //alert('开始上传');
+                                    },
+                                    onInit:function(){
+                                        //alert('初始化');
+                                    },
+                                    onUploadComplete:function(data, msg){
+                                        var msg = $.parseJSON(msg);
+                                        if (msg.status == 1){
+                                            var old_html = $("#file-pre-{$v}").html();
+                                            var old_path = $("#{$v}").val();
+                                            var num = $('#file-pre-{$v}').find('.{$v}').length + 1;
+                                            var html = old_html + "" +
+                                                "<a href='"+msg.path+"' target='_blank' class=\"{$v} {$v}-"+num+"\">"+msg.path+"</a>" +
+                                                "  &nbsp; <a title=\"删除\" class=\"{$v}-"+num+"\" onclick=\"del_files($('.{$v}-"+num+"'), $('#{$v}'), $('#file-pre-{$v}'), '{$v}')\"><font color=\"red\"><i class=\"fa fa-times\"></i></font> </a>" +
+                                                "<br/>";
+                                            $("#{$v}").val(old_path+msg.path+',');
+                                            $("#file-pre-{$v}").html(html);
+                                        }else {
+                                            layer.msg(msg.msg)
+                                        }
+                                    },
+                                    onDelete:function(file){
+                                        console.log('删除的文件：'+file);
+                                        console.log(file);
+                                    }
+                                });
+                            </script>
+                            {/case}
+                                {default /}配置错误
+                            {/switch}
+                            <?php } ?>
+                            {notempty name="$translations[$v]['info']"}
+                                <span class="help-block m-b-none">{$translations[$v]['info'] }                     {/notempty}
+                        </div>
+                    </div>
+                    {/foreach}
+                    <!--<input type="hidden" name='_method' value="PUT" />-->
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <a class="btn btn-white" href="{:url('/admin/'.$route)}">取消并返回</a>
+                            <button class="btn btn-primary" id="sub" type="button">确认更新</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        $(function () {
+        	
+            $('#sub').click(function () {
+                var data = $("#form").serialize();
+                
+                var index = layer.load(1);
+                $.ajax({
+                    type: "PUT",
+                    url: "{:url('/admin/'.$route.'/'.$id)}",
+                    data: data,
+                    //返回数据的格式
+                    datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+                    //成功返回之后调用的函数
+                    success: function (msg) {
+                        layer.close(index);
+                        if (msg.status == 1) {
+                            layer.msg('更新成功', {icon: 1, time: 600}, function () {
+                                window.location.href = "{:url('/admin/'.$route)}";
+                            })
+                        } else {
+                            layer.msg(msg.msg, {icon: 2, time: 800})
+                        }
+                    },
+                    //调用出错执行的函数
+                    error: function () {
+                        layer.close(index);
+                        layer.alert('系统异常')
+                        //请求出错处理
+                    }
+                });
+            })
+        })
+    </script>
+    <script>
+        function del_file(obj, input) {
+            $(obj).remove();
+            $(input).val('');
+        }
+
+        function del_files(obj, input, spanObj, field) {
+            $(obj).remove();
+            var str = '';
+            $(spanObj).find('.'+field).each(function(){
+                str += $(this).attr('href')+',';
+            });
+
+            $(input).val(str);
+        }
+        function del_images(obj, input, spanObj, field) {
+            $(obj).remove();
+            var str = '';
+            $(spanObj).find('.'+field).each(function(){
+                str += $(this).attr('src')+',';
+            });
+
+            $(input).val(str);
+        }
+    </script>
+</div>

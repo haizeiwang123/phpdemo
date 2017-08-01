@@ -1,0 +1,39 @@
+<?php
+namespace {%namespace%};
+use app\common\controller\Curd;
+use think\Request;
+
+class {%className%} extends Curd {
+
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->init();
+
+    }
+    public function init(){
+
+        $this->route = '{%route%}';  //路由(填写资源路由)
+        $this->label = '';  //标题展示
+
+        //字典
+        $this->translations = [{%translations%}];
+
+        //列表页字段
+        $this->listFields = [
+            {%field%}
+        ];
+
+        //表单页字段
+        $this->formFields = [
+            {%field%}
+        ];
+
+    }
+    //实例化model类（不可删，必写）
+    public function model()
+    {
+        return \app\common\model\{%model%}::class;
+    }
+}
