@@ -322,15 +322,15 @@ function stamp($file){
 2.分页强烈建议前端分页模板，后端只输出数据这样更加灵活，分页模板需绑定数据，page->当前页，allcount->总条数，num->每页多少个。分页模板采用腾讯模板，template在静态文件common里面
 ```php
 var render = template.compile(pageTpl);
-				var parameter = "&filter=" + 1 + "&sort=" + 1 + "&cid=" + 1;
-				var html = render({
-					num:{$perPage},
-					Page:{$page},
-					TotalPage:Math.ceil({$allPage}/{$perPage}),
-					cController: "xh/public/index.php/admin/people",
-					cAction: '',
-					link: parameter
-				});
+var parameter = "&filter=" + 1 + "&sort=" + 1 + "&cid=" + 1;
+var html = render({
+	num:{$perPage},
+	Page:{$page},
+	TotalPage:Math.ceil({$allPage}/{$perPage}),
+	cController: "xh/public/index.php/admin/people",
+	cAction: '',
+	link: parameter
+});
 ```
 ## 工具推荐
 1. 强烈建议使用IDE工具，代码提示以及自动引入命名空间等等，对开发效率有所帮助，推荐使用 PhpStorm =.=
